@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "495985051598",
+    "project_id": "record-notes-app",
+    "storage_bucket": "record-notes-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:495985051598:android:8af16836e599ea68db4d9f",
+        "android_client_info": {
+          "package_name": "com.example.record_notes_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDB5M7vRYtUsOxlczrxCfW2FXwMGH2nLhw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
