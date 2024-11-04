@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:record_notes_app/auth/login.dart';
+import 'package:record_notes_app/auth/signup.dart';
 import 'package:record_notes_app/firebase_options.dart';
 import 'package:record_notes_app/homepage.dart';
 
@@ -21,9 +22,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return  MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Login(),
+      home:const Login(),
+      routes: {
+        'signup':(context)=>const SignUp(),
+        'login':(context)=>const Login(),
+      },
     );
   }
 }
