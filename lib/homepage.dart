@@ -13,8 +13,15 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.orange,
+        onPressed: () {
+          Navigator.of(context).pushNamed('addcategory');
+        },
+        child: Icon(Icons.add),
+      ),
       appBar: AppBar(
-        title: Text('Firebase Install'),
+        title: Text('Home Page'),
         actions: [
           IconButton(
               onPressed: () async {
@@ -27,9 +34,38 @@ class _HomePageState extends State<HomePage> {
               icon: Icon(Icons.exit_to_app))
         ],
       ),
-      body: ListView(
+      body: GridView(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, mainAxisExtent: 160),
         children: [
-          Text('Wellcom'),
+          Card(
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Image.asset(
+                    'imags/folder.png',
+                    height: 100,
+                  ),
+                  Text('Company'),
+                ],
+              ),
+            ),
+          ),
+          Card(
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Image.asset(
+                    'imags/folder.png',
+                    height: 100,
+                  ),
+                  Text('Home'),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

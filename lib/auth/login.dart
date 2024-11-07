@@ -21,7 +21,9 @@ class _LoginState extends State<Login> {
 
   Future signInWithGoogle() async {
     // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();          ///oooooo
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    ///oooooo
     if (googleUser == null) {
       return;
     }
@@ -106,13 +108,48 @@ class _LoginState extends State<Login> {
                       }
                     },
                   ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 10, bottom: 20),
-                    alignment: Alignment.topRight,
-                    child: const Text(
-                      'Forget Password?',
-                      style: TextStyle(
-                        fontSize: 14,
+                  InkWell(
+                    onTap: () async {
+                      if (email.text == '') {
+                        AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.error,
+                          animType: AnimType.rightSlide,
+                          title: 'Error Title',
+                          desc: 'Please write it in Gmail',
+                        ).show();
+                        return;
+                      }
+                      try {
+                        await FirebaseAuth.instance
+                            .sendPasswordResetEmail(email: email.text);
+                        AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.success,
+                          animType: AnimType.rightSlide,
+                          title: 'Error Title',
+                          desc:
+                              'A message has been sent to your email. Please go to your Gmail',
+                        ).show();
+                      } catch (e) {
+                        AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.error,
+                          animType: AnimType.rightSlide,
+                          title: 'Error Title',
+                          desc:
+                              'Please make sure that the email you entered is correct and try again',
+                        ).show();
+                      }
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 10, bottom: 20),
+                      alignment: Alignment.topRight,
+                      child: const Text(
+                        'Forget Password?',
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ),
