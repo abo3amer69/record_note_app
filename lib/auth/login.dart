@@ -18,6 +18,7 @@ class _LoginState extends State<Login> {
   TextEditingController password = TextEditingController();
 
   GlobalKey<FormState> formState = GlobalKey<FormState>();
+  bool isLoading = false;
 
   Future signInWithGoogle() async {
     // Trigger the authentication flow
@@ -46,109 +47,223 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            Form(
-              key: formState,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Container(
+              padding: const EdgeInsets.all(20),
+              child: ListView(
                 children: [
-                  Container(
-                    height: 50,
+                  Form(
+                    key: formState,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 50,
+                        ),
+                        const CustomLogoAuth(),
+                        Container(
+                          height: 20,
+                        ),
+                        const Text(
+                          'Login',
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold),
+                        ),
+                        Container(
+                          height: 10,
+                        ),
+                        const Text(
+                          'Login To Continue Using The App',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        Container(
+                          height: 20,
+                        ),
+                        const Text(
+                          'Email',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        Container(
+                          height: 10,
+                        ),
+                        CustomTextForm(
+                          hinttext: 'Enter Your Email',
+                          mycontroller: email,
+                          validator: (val) {
+                            if (val == '') {
+                              return 'cant to be login';
+                            }
+                          },
+                        ),
+                        const Text(
+                          'Password',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        Container(
+                          height: 10,
+                        ),
+                        CustomTextForm(
+                          hinttext: 'Enter Your Password',
+                          mycontroller: password,
+                          validator: (val) {
+                            if (val == '') {
+                              return 'cant to be login';
+                            }
+                          },
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if (email.text == '') {
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.error,
+                                animType: AnimType.rightSlide,
+                                title: 'Error Title',
+                                desc: 'Please write it in Gmail',
+                              ).show();
+                              return;
+                            }
+                            try {
+                              await FirebaseAuth.instance
+                                  .sendPasswordResetEmail(email: email.text);
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.success,
+                                animType: AnimType.rightSlide,
+                                title: 'Error Title',
+                                desc:
+                                    'A message has been sent to your email. Please go to your Gmail',
+                              ).show();
+                            } catch (e) {
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.error,
+                                animType: AnimType.rightSlide,
+                                title: 'Error Title',
+                                desc:
+                                    'Please make sure that the email you entered is correct and try again',
+                              ).show();
+                            }
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(top: 10, bottom: 20),
+                            alignment: Alignment.topRight,
+                            child: const Text(
+                              'Forget Password?',
+                              style: TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const CustomLogoAuth(),
+                  CustomButtonAuth(
+                      title: 'Login',
+                      onPressed: () async {
+                        if (formState.currentState!.validate()) {
+                          try {
+                            isLoading = true;
+                            setState(() {});
+                            final credential = await FirebaseAuth.instance
+                                .signInWithEmailAndPassword(
+                                    email: email.text, password: password.text);
+                            isLoading = false;
+                            setState(() {});
+                            if (credential.user!.emailVerified) {
+                              Navigator.of(context)
+                                  .pushReplacementNamed('homepage');
+                            } else {
+                              FirebaseAuth.instance.currentUser!
+                                  .sendEmailVerification();
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.error,
+                                animType: AnimType.rightSlide,
+                                title: 'Error Title',
+                                desc:
+                                    'Please Go To Your Email And Verify To Activate Your Account',
+                              ).show();
+                            }
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'user-not-found') {
+                              print('No user found for that email.');
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.error,
+                                animType: AnimType.rightSlide,
+                                title: 'Error Title',
+                                desc: 'No user found for that email.',
+                              ).show();
+                            } else if (e.code == 'wrong-password') {
+                              print('Wrong password provided for that user.');
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.error,
+                                animType: AnimType.rightSlide,
+                                title: 'Error Title',
+                                desc: 'Wrong password provided for that user.',
+                              ).show();
+                            }
+                          }
+                        } else {
+                          print('not value');
+                        }
+                      }),
                   Container(
                     height: 20,
                   ),
-                  const Text(
-                    'Login',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                  ),
-                  Container(
-                    height: 10,
-                  ),
-                  const Text(
-                    'Login To Continue Using The App',
-                    style: TextStyle(color: Colors.grey),
+                  MaterialButton(
+                    height: 40,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    color: Colors.red[700],
+                    textColor: Colors.white,
+                    onPressed: () {
+                      signInWithGoogle();
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Login Whith Google'),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Image.asset(
+                          'imags/google.png',
+                          width: 20,
+                        ),
+                      ],
+                    ),
                   ),
                   Container(
                     height: 20,
-                  ),
-                  const Text(
-                    'Email',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  Container(
-                    height: 10,
-                  ),
-                  CustomTextForm(
-                    hinttext: 'Enter Your Email',
-                    mycontroller: email,
-                    validator: (val) {
-                      if (val == '') {
-                        return 'cant to be login';
-                      }
-                    },
-                  ),
-                  const Text(
-                    'Password',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  Container(
-                    height: 10,
-                  ),
-                  CustomTextForm(
-                    hinttext: 'Enter Your Password',
-                    mycontroller: password,
-                    validator: (val) {
-                      if (val == '') {
-                        return 'cant to be login';
-                      }
-                    },
                   ),
                   InkWell(
-                    onTap: () async {
-                      if (email.text == '') {
-                        AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.error,
-                          animType: AnimType.rightSlide,
-                          title: 'Error Title',
-                          desc: 'Please write it in Gmail',
-                        ).show();
-                        return;
-                      }
-                      try {
-                        await FirebaseAuth.instance
-                            .sendPasswordResetEmail(email: email.text);
-                        AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.success,
-                          animType: AnimType.rightSlide,
-                          title: 'Error Title',
-                          desc:
-                              'A message has been sent to your email. Please go to your Gmail',
-                        ).show();
-                      } catch (e) {
-                        AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.error,
-                          animType: AnimType.rightSlide,
-                          title: 'Error Title',
-                          desc:
-                              'Please make sure that the email you entered is correct and try again',
-                        ).show();
-                      }
+                    onTap: () {
+                      Navigator.of(context).pushReplacementNamed('signup');
                     },
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 10, bottom: 20),
-                      alignment: Alignment.topRight,
-                      child: const Text(
-                        'Forget Password?',
-                        style: TextStyle(
-                          fontSize: 14,
+                    child: const Center(
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Dont Have AN Account? ',
+                            ),
+                            TextSpan(
+                              text: 'Register',
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -156,108 +271,6 @@ class _LoginState extends State<Login> {
                 ],
               ),
             ),
-            CustomButtonAuth(
-                title: 'Login',
-                onPressed: () async {
-                  if (formState.currentState!.validate()) {
-                    try {
-                      final credential = await FirebaseAuth.instance
-                          .signInWithEmailAndPassword(
-                              email: email.text, password: password.text);
-                      if (credential.user!.emailVerified) {
-                        Navigator.of(context).pushReplacementNamed('homepage');
-                      } else {
-                        FirebaseAuth.instance.currentUser!
-                            .sendEmailVerification();
-                        AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.error,
-                          animType: AnimType.rightSlide,
-                          title: 'Error Title',
-                          desc:
-                              'Please Go To Your Email And Verify To Activate Your Account',
-                        ).show();
-                      }
-                    } on FirebaseAuthException catch (e) {
-                      if (e.code == 'user-not-found') {
-                        print('No user found for that email.');
-                        AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.error,
-                          animType: AnimType.rightSlide,
-                          title: 'Error Title',
-                          desc: 'No user found for that email.',
-                        ).show();
-                      } else if (e.code == 'wrong-password') {
-                        print('Wrong password provided for that user.');
-                        AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.error,
-                          animType: AnimType.rightSlide,
-                          title: 'Error Title',
-                          desc: 'Wrong password provided for that user.',
-                        ).show();
-                      }
-                    }
-                  } else {
-                    print('not value');
-                  }
-                }),
-            Container(
-              height: 20,
-            ),
-            MaterialButton(
-              height: 40,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              color: Colors.red[700],
-              textColor: Colors.white,
-              onPressed: () {
-                signInWithGoogle();
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Login Whith Google'),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Image.asset(
-                    'imags/google.png',
-                    width: 20,
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              height: 20,
-            ),
-            InkWell(
-              onTap: () {
-                Navigator.of(context).pushReplacementNamed('signup');
-              },
-              child: const Center(
-                child: Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Dont Have AN Account? ',
-                      ),
-                      TextSpan(
-                        text: 'Register',
-                        style: TextStyle(
-                          color: Colors.orange,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

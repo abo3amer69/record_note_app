@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:record_notes_app/component/custombuttonauth.dart';
 import 'package:record_notes_app/component/customtextfieldadd.dart';
@@ -13,6 +14,21 @@ class _AddCategoryState extends State<AddCategory> {
   GlobalKey<FormState> formState = GlobalKey<FormState>();
 
   TextEditingController name = TextEditingController();
+
+  CollectionReference categories =
+      FirebaseFirestore.instance.collection('categories');
+
+  addCategory() async {
+    if (formState.currentState!.validate()) {
+      try {
+        DocumentReference response = await categories.add({'name': name.text});
+        Navigator.of(context).pushReplacementNamed('homepage');
+      } catch (e) {
+        print("error $e");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +56,9 @@ class _AddCategoryState extends State<AddCategory> {
               ),
               CustomButtonAuth(
                 title: 'Add',
-                onPressed: (){},
+                onPressed: () {
+                  addCategory();
+                },
               ),
             ],
           )),
