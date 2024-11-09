@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:record_notes_app/categories/edit.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -72,17 +73,22 @@ class _HomePageState extends State<HomePage> {
                         dialogType: DialogType.warning,
                         animType: AnimType.rightSlide,
                         title: 'Error',
-                        desc: 'Do You Want this Delet',
-                        btnCancelOnPress: () {
-                          print('Cancel');
-                        },
-                        btnOkOnPress: () async {
+                        desc: 'What DO You Want',
+                        btnCancelText: 'Delet',
+                        btnOkText: 'Updat',
+                        btnCancelOnPress: () async {
                           await FirebaseFirestore.instance
                               .collection('categories')
                               .doc(data[i].id)
                               .delete();
                           Navigator.of(context)
                               .pushReplacementNamed('homepage');
+                        },
+                        btnOkOnPress: () async {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => EditCategory.EditCategory(
+                                  docId: data[i].id,
+                                  oldName: data[i]['name'])));
                         }).show();
                   },
                   child: Card(

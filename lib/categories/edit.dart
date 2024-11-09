@@ -4,14 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:record_notes_app/component/custombuttonauth.dart';
 import 'package:record_notes_app/component/customtextfieldadd.dart';
 
-class AddCategory extends StatefulWidget {
-  const AddCategory({super.key});
+class EditCategory extends StatefulWidget {
+  final String docId;
+  final String oldName;
+  const EditCategory.EditCategory(
+      {super.key, required this.docId, required this.oldName});
 
   @override
-  State<AddCategory> createState() => _AddCategoryState();
+  State<EditCategory> createState() => _EditCategoryState();
 }
 
-class _AddCategoryState extends State<AddCategory> {
+class _EditCategoryState extends State<EditCategory> {
   GlobalKey<FormState> formState = GlobalKey<FormState>();
 
   TextEditingController name = TextEditingController();
@@ -20,13 +23,12 @@ class _AddCategoryState extends State<AddCategory> {
       FirebaseFirestore.instance.collection('categories');
   bool isLoading = false;
 
-  addCategory() async {
+  editCategory() async {
     if (formState.currentState!.validate()) {
       try {
         isLoading = true;
         setState(() {});
-        DocumentReference response = await categories.add(
-            {'name': name.text, 'id': FirebaseAuth.instance.currentUser!.uid});
+        await categories.doc(widget.docId).set({'name': name.text});
 
         Navigator.of(context)
             .pushNamedAndRemoveUntil('homepage', (Route) => false);
@@ -42,6 +44,12 @@ class _AddCategoryState extends State<AddCategory> {
   void dispose() {
     name.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    name.text = widget.oldName;
   }
 
   @override
@@ -74,9 +82,9 @@ class _AddCategoryState extends State<AddCategory> {
                       ),
                     ),
                     CustomButtonAuth(
-                      title: 'Add',
+                      title: 'Save',
                       onPressed: () {
-                        addCategory();
+                        editCategory();
                       },
                     ),
                   ],
