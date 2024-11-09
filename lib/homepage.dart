@@ -16,8 +16,10 @@ class _HomePageState extends State<HomePage> {
   bool isLoading = true;
 
   getData() async {
-    QuerySnapshot querySnapShot =
-        await FirebaseFirestore.instance.collection('categories').get();
+    QuerySnapshot querySnapShot = await FirebaseFirestore.instance
+        .collection('categories')
+        .where('id', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get();
     data.addAll(querySnapShot.docs);
     isLoading = false;
     setState(() {});
@@ -79,7 +81,8 @@ class _HomePageState extends State<HomePage> {
                               .collection('categories')
                               .doc(data[i].id)
                               .delete();
-                              Navigator.of(context).pushReplacementNamed('homepage');
+                          Navigator.of(context)
+                              .pushReplacementNamed('homepage');
                         }).show();
                   },
                   child: Card(

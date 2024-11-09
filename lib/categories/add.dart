@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:record_notes_app/component/custombuttonauth.dart';
 import 'package:record_notes_app/component/customtextfieldadd.dart';
@@ -21,7 +22,8 @@ class _AddCategoryState extends State<AddCategory> {
   addCategory() async {
     if (formState.currentState!.validate()) {
       try {
-        DocumentReference response = await categories.add({'name': name.text});
+        DocumentReference response = await categories.add(
+            {'name': name.text, 'id': FirebaseAuth.instance.currentUser!.uid});
         Navigator.of(context).pushReplacementNamed('homepage');
       } catch (e) {
         print("error $e");
