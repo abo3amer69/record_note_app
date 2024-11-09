@@ -186,19 +186,23 @@ class _LoginState extends State<Login> {
                                 context: context,
                                 dialogType: DialogType.error,
                                 animType: AnimType.rightSlide,
-                                title: 'Error Title',
+                                title: 'Error',
                                 desc:
                                     'Please Go To Your Email And Verify To Activate Your Account',
                               ).show();
                             }
                           } on FirebaseAuthException catch (e) {
+                            isLoading=false;
+                            setState(() {
+                              
+                            });
                             if (e.code == 'user-not-found') {
                               print('No user found for that email.');
                               AwesomeDialog(
                                 context: context,
                                 dialogType: DialogType.error,
                                 animType: AnimType.rightSlide,
-                                title: 'Error Title',
+                                title: 'Error',
                                 desc: 'No user found for that email.',
                               ).show();
                             } else if (e.code == 'wrong-password') {
@@ -207,7 +211,7 @@ class _LoginState extends State<Login> {
                                 context: context,
                                 dialogType: DialogType.error,
                                 animType: AnimType.rightSlide,
-                                title: 'Error Title',
+                                title: 'Error',
                                 desc: 'Wrong password provided for that user.',
                               ).show();
                             }
