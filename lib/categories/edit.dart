@@ -28,7 +28,9 @@ class _EditCategoryState extends State<EditCategory> {
       try {
         isLoading = true;
         setState(() {});
-        await categories.doc(widget.docId).set({'name': name.text});
+        await categories
+            .doc(widget.docId)
+            .set({'name': name.text}, SetOptions(merge: true));
 
         Navigator.of(context)
             .pushNamedAndRemoveUntil('homepage', (Route) => false);

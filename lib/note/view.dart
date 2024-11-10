@@ -4,23 +4,24 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:record_notes_app/categories/edit.dart';
-import 'package:record_notes_app/note/view.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class NoteView extends StatefulWidget {
+  final String categoryid;
+  const NoteView({super.key, required this.categoryid});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<NoteView> createState() => _NoteViewState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _NoteViewState extends State<NoteView> {
   List<QueryDocumentSnapshot> data = [];
   bool isLoading = true;
 
   getData() async {
     QuerySnapshot querySnapShot = await FirebaseFirestore.instance
         .collection('categories')
-        .where('id', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .doc(widget.categoryid)
+        .collection('note')
         .get();
     data.addAll(querySnapShot.docs);
     isLoading = false;
@@ -45,7 +46,7 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: Text('Home Page'),
+        title: Text('Note'),
         actions: [
           IconButton(
               onPressed: () async {
@@ -68,46 +69,36 @@ class _HomePageState extends State<HomePage> {
                   crossAxisCount: 2, mainAxisExtent: 160),
               itemBuilder: (context, i) {
                 return InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            NoteView(categoryid: data[i].id)));
-                  },
                   onLongPress: () {
                     AwesomeDialog(
-                        context: context,
-                        dialogType: DialogType.warning,
-                        animType: AnimType.rightSlide,
-                        title: 'updating',
-                        desc: 'What DO You Want',
-                        btnCancelText: 'Delet',
-                        btnOkText: 'Updat',
-                        btnCancelOnPress: () async {
-                          await FirebaseFirestore.instance
-                              .collection('categories')
-                              .doc(data[i].id)
-                              .delete();
-                          Navigator.of(context)
-                              .pushReplacementNamed('homepage');
-                        },
-                        btnOkOnPress: () async {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => EditCategory.EditCategory(
-                                  docId: data[i].id,
-                                  oldName: data[i]['name'])));
-                        }).show();
+                            context: context,
+                            dialogType: DialogType.warning,
+                            animType: AnimType.rightSlide,
+                            title: 'updating',
+                            desc: 'What DO You Want',
+                            btnCancelText: 'Delet',
+                            btnOkText: 'Updat',
+                            btnCancelOnPress: () async {
+                              // await FirebaseFirestore.instance
+                              //     .collection('categories')
+                              //     .doc(data[i].id)
+                              //     .delete();
+                              // Navigator.of(context)
+                              //     .pushReplacementNamed('homepage');
+                            },
+                            btnOkOnPress: () async {
+                              // Navigator.of(context).push(MaterialPageRoute(
+                              //     builder: (context) => EditCategory.EditCategory(
+                              //         docId: data[i].id,
+                              //         oldName: data[i]['name'])));
+                            })
+                        .show();
                   },
                   child: Card(
                     child: Container(
                       padding: EdgeInsets.all(10),
                       child: Column(
-                        children: [
-                          Image.asset(
-                            'imags/folder.png',
-                            height: 100,
-                          ),
-                          Text('${data[i]['name']}')
-                        ],
+                        children: [Text('${data[i]['note']}')],
                       ),
                     ),
                   ),
