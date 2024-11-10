@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:record_notes_app/categories/edit.dart';
 import 'package:record_notes_app/note/add.dart';
+import 'package:record_notes_app/note/edit.dart';
 
 class NoteView extends StatefulWidget {
   final String categoryid;
@@ -73,34 +74,16 @@ class _NoteViewState extends State<NoteView> {
                             crossAxisCount: 2, mainAxisExtent: 160),
                     itemBuilder: (context, i) {
                       return InkWell(
-                        onLongPress: () {
-                          AwesomeDialog(
-                                  context: context,
-                                  dialogType: DialogType.warning,
-                                  animType: AnimType.rightSlide,
-                                  title: 'updating',
-                                  desc: 'What DO You Want',
-                                  btnCancelText: 'Delet',
-                                  btnOkText: 'Updat',
-                                  btnCancelOnPress: () async {
-                                    // await FirebaseFirestore.instance
-                                    //     .collection('categories')
-                                    //     .doc(data[i].id)
-                                    //     .delete();
-                                    // Navigator.of(context)
-                                    //     .pushReplacementNamed('homepage');
-                                  },
-                                  btnOkOnPress: () async {
-                                    // Navigator.of(context).push(MaterialPageRoute(
-                                    //     builder: (context) => EditCategory.EditCategory(
-                                    //         docId: data[i].id,
-                                    //         oldName: data[i]['name'])));
-                                  })
-                              .show();
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => EditNote(
+                                  notedocid: data[i].id,
+                                  categorydocid: widget.categoryid,
+                                  value: data[i]['note'])));
                         },
                         child: Card(
                           child: Container(
-                            padding: EdgeInsets.all(10),
+                            padding: EdgeInsets.all(20),
                             child: Column(
                               children: [Text('${data[i]['note']}')],
                             ),
