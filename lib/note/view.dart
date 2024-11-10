@@ -74,6 +74,26 @@ class _NoteViewState extends State<NoteView> {
                             crossAxisCount: 2, mainAxisExtent: 160),
                     itemBuilder: (context, i) {
                       return InkWell(
+                        onLongPress: () {
+                          AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.warning,
+                              animType: AnimType.rightSlide,
+                              title: 'Error',
+                              desc: 'do ypu sure for this delet',
+                              btnCancelOnPress: () async {},
+                              btnOkOnPress: () async {
+                                await FirebaseFirestore.instance
+                                    .collection('categories')
+                                    .doc(widget.categoryid)
+                                    .collection('note')
+                                    .doc(data[i].id)
+                                    .delete();
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => NoteView(
+                                        categoryid: widget.categoryid)));
+                              }).show();
+                        },
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => EditNote(
